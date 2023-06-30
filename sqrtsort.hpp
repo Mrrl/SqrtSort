@@ -324,7 +324,7 @@ namespace sqrtsort {
 
 	template<typename RandomAccessIterator>
 	void sqrtsort(RandomAccessIterator first, RandomAccessIterator last) {
-		_sqrtsort(first, (int)std::distance(first, last), std::less<_internal::iter_value<RandomAccessIterator>>());
+		sqrtsort(first, last, std::less<_internal::iter_value<RandomAccessIterator>>());
 	}
 }
 
