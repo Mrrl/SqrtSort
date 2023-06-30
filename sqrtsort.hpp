@@ -316,9 +316,15 @@ namespace sqrtsort {
 		}
 	};
 
+
 	template<typename RandomAccessIterator, typename Compare>
 	void sqrtsort(RandomAccessIterator first, RandomAccessIterator last, Compare comp) {
 		_internal::SqrtSort(first, (int)std::distance(first, last), comperator<Compare>(std::move(comp)));
+	}
+
+	template<typename RandomAccessIterator>
+	void sqrtsort(RandomAccessIterator first, RandomAccessIterator last) {
+		_sqrtsort(first, (int)std::distance(first, last), std::less<_internal::iter_value<RandomAccessIterator>>());
 	}
 }
 
