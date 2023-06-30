@@ -1,5 +1,7 @@
 SqrtSort
 ========
+![language](https://img.shields.io/badge/language-c++-yellow.svg)
+![C++](https://img.shields.io/badge/c++-14-green.svg)
 
 Stable sorting with O(sqrt(N)) external memory
 
