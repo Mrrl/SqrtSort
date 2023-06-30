@@ -34,4 +34,6 @@ int main(){
     std::vector<int> a{4,6,43,64,6546,22,7,46,8};
     sqrtsort::sqrtsort(a.begin(), a.end());
     for(auto p:a) std::cout<<p<<" ";
+    return 0;
+}
 ```
