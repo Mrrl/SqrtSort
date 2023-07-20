@@ -1,27 +1,3 @@
-// sqrt-sort: Stable sorting with O(sqrt(N)) external memory.
-// 
-// MIT License:
-// Copyright (c) 2023 The pysoft group.
-// Permission is hereby granted, free of charge, to any person obtaining
-// a copy of this softwareand associated documentation files(the
-//    "Software"), to deal in the Software without restriction, including
-//    without limitation the rights to use, copy, modify, merge, publish,
-//    distribute, sublicense, and /or sell copies of the Software, and to
-//    permit persons to whom the Software is furnished to do so, subject to
-//    the following conditions :
-//
-// The above copyright noticeand this permission notice shall be
-// included in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-// NONINFRINGEMENT.IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
-// LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
-// OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-// WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-
 /********* Sqrt sorting *********************************/
 /*                                                       */
 /* (c) 2014 by Andrey Astrelin                           */
@@ -44,6 +20,13 @@ namespace sqrtsort {
 		template<typename It>
 		using iter_value = typename std::iterator_traits<It>::value_type;
 
+		template<typename It, typename Comp>
+		int sort_cmp(It a, It b, Comp comp) {
+			if (comp(*a, *b)) return -1;
+			else if (comp(*b, *a)) return 1;
+			else return 0;
+		}
+
 		template<typename It>
 		inline void sqrtsort_swap1(It a, It b) {
 			iter_value<It> c = *a;
@@ -61,7 +44,7 @@ namespace sqrtsort {
 			int p0 = L1 + L2 + M - 1, p2 = L1 + L2 - 1, p1 = L1 - 1;
 
 			while (p1 >= 0) {
-				if (p2 < L1 || comp(arr + p1, arr + p2)>0) {
+				if (p2 < L1 || sort_cmp(arr + p1, arr + p2, comp)>0) {
 					arr[p0--] = arr[p1--];
 				}
 				else {
@@ -77,7 +60,7 @@ namespace sqrtsort {
 			int p0 = 0, p1 = L1;
 			L2 += L1;
 			while (p1 < L2) {
-				if (p0 == L1 || comp(arr + p0, arr + p1) > 0) arr[M++] = arr[p1++];
+				if (p0 == L1 || sort_cmp(arr + p0, arr + p1, comp) > 0) arr[M++] = arr[p1++];
 				else arr[M++] = arr[p0++];
 			}
 			if (M != p0) while (p0 < L1) arr[M++] = arr[p0++];
@@ -89,7 +72,7 @@ namespace sqrtsort {
 			int p0 = 0, p1 = 0, M = -L2;
 
 			while (p1 < L2) {
-				if (p0 == L1 || comp(arr + p0, arr2 + p1) >= 0) arr[M++] = arr2[p1++];
+				if (p0 == L1 || sort_cmp(arr + p0, arr2 + p1, comp) >= 0) arr[M++] = arr2[p1++];
 				else arr[M++] = arr[p0++];
 			}
 			if (M != p0) while (p0 < L1) arr[M++] = arr[p0++];
@@ -100,7 +83,7 @@ namespace sqrtsort {
 			int p0 = -lkeys, p1 = 0, p2 = *alen1, q1 = p2, q2 = p2 + len2;
 			int ftype = 1 - *atype;  // 1 if inverted
 			while (p1 < q1 && p2 < q2) {
-				if (comp(arr + p1, arr + p2) - ftype < 0) arr[p0++] = arr[p1++];
+				if (sort_cmp(arr + p1, arr + p2, comp) - ftype < 0) arr[p0++] = arr[p1++];
 				else arr[p0++] = arr[p2++];
 			}
 			if (p1 < q1) {
@@ -170,7 +153,7 @@ namespace sqrtsort {
 			int m, u, h, p0, p1, rest, restk, p;
 			for (m = 1; m < L; m += 2) {
 				u = 0;
-				if (comp(arr + (m - 1), arr + m) > 0) u = 1;
+				if (sort_cmp(arr + (m - 1), arr + m, comp) > 0) u = 1;
 				arr[m - 3] = arr[m - 1 + u];
 				arr[m - 2] = arr[m - u];
 			}
@@ -206,7 +189,7 @@ namespace sqrtsort {
 		static void sqrtsort_SortIns(It arr, int len, Comp comp) {
 			int i, j;
 			for (i = 1; i < len; i++) {
-				for (j = i - 1; j >= 0 && comp(arr + (j + 1), arr + j) < 0; j--) sqrtsort_swap1(arr + j, arr + (j + 1));
+				for (j = i - 1; j >= 0 && sort_cmp(arr + (j + 1), arr + j, comp) < 0; j--) sqrtsort_swap1(arr + j, arr + (j + 1));
 			}
 		}
 
@@ -235,7 +218,7 @@ namespace sqrtsort {
 				for (u = 1; u < NBlk; u++) {
 					p = u - 1;
 					for (v = u; v < NBlk; v++) {
-						kc = comp(arr1 + p * lblock, arr1 + v * lblock);
+						kc = sort_cmp(arr1 + p * lblock, arr1 + v * lblock, comp);
 						if (kc > 0 || (kc == 0 && tags[p] > tags[v])) p = v;
 					}
 					if (p != u - 1) {
@@ -246,7 +229,7 @@ namespace sqrtsort {
 				nbl2 = llast = 0;
 				if (b == M) llast = lrest % lblock;
 				if (llast != 0) {
-					while (nbl2 < NBlk && comp(arr1 + NBlk * lblock, arr1 + (NBlk - nbl2 - 1) * lblock) < 0) nbl2++;
+					while (nbl2 < NBlk && sort_cmp(arr1 + NBlk * lblock, arr1 + (NBlk - nbl2 - 1) * lblock, comp) < 0) nbl2++;
 				}
 				sqrtsort_MergeBuffersLeftWithXBuf(tags, midkey, arr1, NBlk - nbl2, lblock, nbl2, llast, comp);
 			}
@@ -295,31 +278,11 @@ namespace sqrtsort {
 		}
 	}
 
-	template<typename Compare>
-	struct comperator {
-		Compare compare;
-
-		explicit comperator(Compare&& comp) :
-			compare(std::forward<Compare>(comp))
-		{}
-
-		template<typename T, typename U>
-		int operator()(T* lhs, U* rhs)
-		{
-			if (compare(*lhs, *rhs)) {
-				return -1;
-			}
-			if (compare(*rhs, *lhs)) {
-				return 1;
-			}
-			return 0;
-		}
-	};
 
 
 	template<typename RandomAccessIterator, typename Compare>
 	void sqrtsort(RandomAccessIterator first, RandomAccessIterator last, Compare comp) {
-		_internal::SqrtSort(first, (int)std::distance(first, last), comperator<Compare>(std::move(comp)));
+		_internal::SqrtSort(first, (int)std::distance(first, last), comp);
 	}
 
 	template<typename RandomAccessIterator>
